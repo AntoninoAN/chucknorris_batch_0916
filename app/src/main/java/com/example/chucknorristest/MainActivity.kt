@@ -1,6 +1,8 @@
 package com.example.chucknorristest
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -20,7 +22,9 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val v = layoutInflater.inflate(R.layout.activity_main, null)
+        val v = layoutInflater
+            .inflate(R.layout.activity_main,
+            null)
         setContentView(v)
 
 
@@ -28,10 +32,16 @@ class MainActivity : AppCompatActivity(),
         tablayout.setupWithViewPager(viewpager)
         tablayout
             .setOnTabSelectedListener(this)
+
+        createSharedPreferences()
+        readingSharedPreferences()
     }
 
     override fun onTabReselected(tab: TabLayout.Tab?) {
         Log.d(TAG, "onTabReselected: ")
+        tab?.let {currentTab->
+            inflateCurrentFragment(currentTab.position)
+        }
     }
 
     override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -66,9 +76,39 @@ class MainActivity : AppCompatActivity(),
         }
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.viewpager, fragment)
+            .replace(R.id.container, fragment)
             .commit()
     }
+
+    //Create a SharedPreferences
+    // Local Storage {SharedPreferences, Databases, Files}
+    // Public Storage {SD Card, Gallery, Documents}
+    fun createSharedPreferences(){
+        val sharedPreferences = getSharedPreferences(
+            "my_shared_preferences",
+            Context.MODE_PRIVATE)
+        val editorSharedPreferences = sharedPreferences.edit()
+        editorSharedPreferences.putString("zipcode", "30067")
+        editorSharedPreferences.putString("units", "celsius")
+        editorSharedPreferences.commit()
+    }
+
+    fun readingSharedPreferences(){
+        val sharedPreferences = getSharedPreferences(
+            "my_shared_preferences",
+            Context.MODE_PRIVATE)
+        val getZipcode =
+            sharedPreferences.getString("zipcode", "N/A")
+        val getUnits =
+            sharedPreferences.getString("units", "N/A")
+
+        //if(getZipcode.equals("N/A") && getUnits.equals("N/A"))
+            //showSettingsActivity()
+    }
+
+
+
+
 }
 
 
